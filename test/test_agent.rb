@@ -25,7 +25,7 @@ class TestAgent < Test::Unit::TestCase
     FileUtils.mkdir_p @deploy_dir
     FileUtils.mkdir_p @binaries_base
 
-    system "#{Galaxy::HostUtils.tar} -C #{File.join(File.dirname(__FILE__), "core_package")} -czf #{@binaries_base}/test-1.0-12345.tar.gz ."
+    system "#{Galaxy::HostUtils.tar} -C #{File.dirname(__FILE__)} -czf #{@binaries_base}/test-1.0-12345.tar.gz core_package"
 
     webrick_logger =  Logger.new(STDOUT)
     webrick_logger.level = Logger::WARN
