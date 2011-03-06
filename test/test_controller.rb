@@ -16,7 +16,7 @@ class TestController < Test::Unit::TestCase
     system "#{Galaxy::HostUtils.tar} -C #{File.dirname(__FILE__)} -czf #{@core_package} core_package"
     @path = Helper.mk_tmpdir
     @deployer = Galaxy::Deployer.new @path, Logger.new("/dev/null")
-    @core_base = @deployer.deploy "1", @core_package, "/config", "/repository", "/binaries"
+    @core_base = @deployer.deploy "1", @core_package, MockConfigInstaller.new
     @controller = Galaxy::Controller.new @core_base, '/config/path', 'http://repository/base', 'http://binaries/base', Logger.new("/dev/null")
   end
   

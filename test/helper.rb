@@ -135,3 +135,11 @@ class MockAgent
       Galaxy::Client::SoftwareDeploymentReport.new.record_result(self)
   end
 end
+
+class MockConfigInstaller
+  attr_reader :base_path
+
+  def install(base_path)
+    @base_path = base_path
+  end
+end

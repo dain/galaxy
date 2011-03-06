@@ -1,3 +1,5 @@
+require 'galaxy/config_installer'
+
 module Galaxy
     module AgentRemoteApi
         # Command to become a specific core
@@ -7,6 +9,7 @@ module Galaxy
             begin
                 requested_config = Galaxy::SoftwareConfiguration.new_from_config_path(requested_config_path)
 
+                # check if versioning policy allows this assignment
                 unless config.config_path.nil? or config.config_path.empty?
                     current_config = Galaxy::SoftwareConfiguration.new_from_config_path(config.config_path) # TODO - this should already be tracked
                     unless versioning_policy.assignment_allowed?(current_config, requested_config)
@@ -16,40 +19,48 @@ module Galaxy
                     end
                 end
 
+                # fetch build.properties from config store
                 build_properties = @prop_builder.build(requested_config.config_path, "build.properties")
                 type = build_properties['type']
                 build = build_properties['build']
                 os = build_properties['os']
 
+                # verify build.properties
                 if type.nil?
                     error_reason = "Cannot determine binary type for #{requested_config.config_path}"
                     @event_dispatcher.dispatch_become_error_event error_reason
                     raise error_reason
                 end
-
                 if build.nil?
                     error_reason = "Cannot determine build number for #{requested_config.config_path}"
                     @event_dispatcher.dispatch_become_error_event error_reason
                     raise error_reason
                 end
-
                 if os and os != @os
                     error_reason = "Cannot assign #{requested_config.config_path} to #{@os} host (requires #{os})"
                     @event_dispatcher.dispatch_become_error_event error_reason
                     raise error_reason
                 end
 
+
                 @logger.info "Becoming #{type}-#{build} with #{requested_config.config_path}"
 
+                # todo stop! should only happen after a a successful install
                 stop!
 
+                # fetch the archive
                 archive_path = @fetcher.fetch type, build
 
+                # create config installer
+                config_installer = Galaxy::ConfigInstaller.new(@repository_base, requested_config.config_path)
+
+                # install software
                 new_deployment = current_deployment_number + 1
-                core_base = deployer.deploy(new_deployment, archive_path, requested_config.config_path, @repository_base, @binaries_base)
-                deployer.activate(new_deployment)
+                core_base = @deployer.deploy(new_deployment, archive_path, config_installer)
+                @deployer.activate(new_deployment)
                 FileUtils.rm(archive_path) if archive_path && File.exists?(archive_path)
 
+                # update store to new installation
                 new_deployment_config = OpenStruct.new(:core_type => type,
                                                        :build => build,
                                                        :core_base => core_base,
@@ -58,10 +69,13 @@ module Galaxy
                 write_config new_deployment, new_deployment_config
                 self.current_deployment_number = new_deployment
 
+                # inform everyone else of the change
+                # todo should this be done after the lock is released
                 @event_dispatcher.dispatch_become_success_event status
                 announce
                 return status
             rescue Exception => e
+                # todo remove archive and install directory
                 error_reason = "Unable to become #{requested_config_path}: #{e}"
                 @logger.error error_reason
                 @event_dispatcher.dispatch_become_error_event error_reason
@@ -286,7 +300,7 @@ module Galaxy
                 stop!
 
                 @logger.debug "Clearing core"
-                deployer.deactivate current_deployment_number
+                @deployer.deactivate current_deployment_number
                 self.current_deployment_number = current_deployment_number + 1
 
                 @event_dispatcher.dispatch_clear_success_event status

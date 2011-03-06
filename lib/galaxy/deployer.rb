@@ -14,7 +14,7 @@ module Galaxy
         # number is the deployment number for this agent
         # archive is the path to the binary archive to deploy
         # props are the properties (configuration) for the core
-        def deploy number, archive, config_path, repository_base, binaries_base
+        def deploy number, archive, config_installer
             # assure base dir exists
             FileUtils.mkdir_p @base
 
@@ -36,26 +36,15 @@ module Galaxy
                 if files.length != 1 || !File::directory?(files[0])
                   raise "Invalid tar file: file does not have a root directory #{archive}"
                 end
+                dir = files[0]
+
+                # copy config files from config repository
+                config_installer.install(dir)
 
                 # move the unpacked directory to core_base
-                dir = files[0]
                 puts "FileUtils.mv(#{dir}, #{core_base})"
                 FileUtils.mv(dir, core_base)
             }
-
-            # exec xndeploy
-            xndeploy = "#{core_base}/bin/xndeploy"
-            unless FileTest.executable? xndeploy
-                xndeploy = "/bin/sh #{xndeploy}"
-            end
-
-            command = "#{xndeploy} --base #{core_base} --binaries #{binaries_base} --config-path #{config_path} --repository #{repository_base}"
-            begin
-                Galaxy::HostUtils.system command
-            rescue Galaxy::HostUtils::CommandFailedError => e
-                raise "Deploy script failed: #{e.message}"
-            end
-
             return core_base
         end
 
