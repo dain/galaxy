@@ -21,18 +21,24 @@ module Galaxy
 
                 # fetch build.properties from config store
                 build_properties = @prop_builder.build(requested_config.config_path, "build.properties")
-                type = build_properties['type']
-                build = build_properties['build']
+                group_id = build_properties['groupId']
+                artifact_id = build_properties['artifactId']
+                version = build_properties['version']
                 os = build_properties['os']
 
                 # verify build.properties
-                if type.nil?
-                    error_reason = "Cannot determine binary type for #{requested_config.config_path}"
+                if group_id.nil?
+                    error_reason = "No groupId for #{requested_config.config_path}"
                     @event_dispatcher.dispatch_become_error_event error_reason
                     raise error_reason
                 end
-                if build.nil?
-                    error_reason = "Cannot determine build number for #{requested_config.config_path}"
+                if artifact_id.nil?
+                    error_reason = "No groupId for #{requested_config.config_path}"
+                    @event_dispatcher.dispatch_become_error_event error_reason
+                    raise error_reason
+                end
+                if version.nil?
+                    error_reason = "No version for #{requested_config.config_path}"
                     @event_dispatcher.dispatch_become_error_event error_reason
                     raise error_reason
                 end
@@ -43,13 +49,13 @@ module Galaxy
                 end
 
 
-                @logger.info "Becoming #{type}-#{build} with #{requested_config.config_path}"
+                @logger.info "Becoming #{group_id}:#{artifact_id}:#{version} with #{requested_config.config_path}"
 
                 # todo stop! should only happen after a a successful install
                 stop!
 
                 # fetch the archive
-                archive_path = @fetcher.fetch type, build
+                archive_path = @fetcher.fetch group_id, artifact_id, version
 
                 # create config installer
                 config_installer = Galaxy::ConfigInstaller.new(@repository_base, requested_config.config_path)
@@ -61,8 +67,8 @@ module Galaxy
                 FileUtils.rm(archive_path) if archive_path && File.exists?(archive_path)
 
                 # update store to new installation
-                new_deployment_config = OpenStruct.new(:core_type => type,
-                                                       :build => build,
+                new_deployment_config = OpenStruct.new(:core_type => "#{group_id}:#{artifact_id}",
+                                                       :build => version,
                                                        :core_base => core_base,
                                                        :config_path => requested_config.config_path,
                                                        :auto_start => true)
@@ -109,29 +115,34 @@ module Galaxy
                 end
 
                 build_properties = @prop_builder.build(requested_config.config_path, "build.properties")
-                type = build_properties['type']
-                build = build_properties['build']
+                group_id = build_properties['groupId']
+                artifact_id = build_properties['artifactId']
+                version = build_properties['version']
 
-                if type.nil?
-                    error_reason = "Cannot determine binary type for #{requested_config.config_path}"
+                if group_id.nil?
+                    error_reason = "No groupId for #{requested_config.config_path}"
+                    @event_dispatcher.dispatch_update_config_error_event error_reason
+                    raise error_reason
+                end
+                if artifact_id.nil?
+                    error_reason = "No groupId for #{requested_config.config_path}"
+                    @event_dispatcher.dispatch_update_config_error_event error_reason
+                    raise error_reason
+                end
+                if version.nil?
+                    error_reason = "No version for #{requested_config.config_path}"
                     @event_dispatcher.dispatch_update_config_error_event error_reason
                     raise error_reason
                 end
 
-                if build.nil?
-                    error_reason = "Cannot determine build number for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_update_config_error_event error_reason
-                    raise error_reason
-                end
-
-                if config.core_type != type
+                if config.core_type != "#{group_id}:#{artifact_id}"
                     error_reason = "Binary type differs (#{config.core_type} != #{type})"
                     @event_dispatcher.dispatch_update_config_error_event error_reason
                     raise error_reason
                 end
 
-                if config.build != build
-                    error_reason = "Binary build number differs (#{config.build} != #{build})"
+                if config.build != version
+                    error_reason = "Binary build number differs (#{config.build} != #{version})"
                     @event_dispatcher.dispatch_update_config_error_event error_reason
                     raise error_reason
                 end
@@ -147,7 +158,7 @@ module Galaxy
                     raise error_reason
                 end
 
-                @config = OpenStruct.new(:core_type => type,
+                @config = OpenStruct.new(:core_type => "#{group_id}:#{artifact_id}",
                                          :build => build,
                                          :core_base => config.core_base,
                                          :config_path => requested_config.config_path)

@@ -20,12 +20,14 @@ class TestAgent < Test::Unit::TestCase
     @data_dir = File.join(@tempdir, 'data')
     @deploy_dir = File.join(@tempdir, 'deploy')
     @binaries_base = File.join(@tempdir, 'binaries')
+    my_archive_dir = File.join(@binaries_base, 'my', 'group', 'test', '1.0-12345')
 
     FileUtils.mkdir_p @data_dir
     FileUtils.mkdir_p @deploy_dir
     FileUtils.mkdir_p @binaries_base
+    FileUtils.mkdir_p my_archive_dir
 
-    system "#{Galaxy::HostUtils.tar} -C #{File.dirname(__FILE__)} -czf #{@binaries_base}/test-1.0-12345.tar.gz core_package"
+    system "#{Galaxy::HostUtils.tar} -C #{File.dirname(__FILE__)} -czf #{my_archive_dir}/test-1.0-12345.tar.gz core_package"
 
     webrick_logger =  Logger.new(STDOUT)
     webrick_logger.level = Logger::WARN

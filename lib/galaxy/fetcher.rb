@@ -7,9 +7,9 @@ module Galaxy
             @base, @log = base_url, log
         end
 
-        # return path on filesystem to the binary
-        def fetch type, version, extension="tar.gz"
-            core_url = "#{@base}/#{type}-#{version}.#{extension}"
+        # return path on filesystem to the binary    #{group_id}:#{artifact_id}
+        def fetch group_id, artifact_id, version, extension="tar.gz"
+            core_url = "#{@base}/#{group_id.gsub('.','/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}.#{extension}"
             tmp = Galaxy::Temp.mk_auto_file "galaxy-download"
             @log.info "Fetching #{core_url} into #{tmp}"
             if @base =~ /^http:/

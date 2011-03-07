@@ -29,12 +29,12 @@ class TestFetcher < Test::Unit::TestCase
   end
     
   def test_local_fetch
-    path = @local_fetcher.fetch "foo", "bar", "properties"
+    path = @local_fetcher.fetch "my.groupId", "artifactId", "version", "properties"
     assert File.exists?(path)
   end
   
   def test_http_fetch
-    path = @http_fetcher.fetch "foo", "bar", "properties"
+    path = @http_fetcher.fetch "my.groupId", "artifactId", "version", "properties"
     assert File.exists?(path)
   end
 
