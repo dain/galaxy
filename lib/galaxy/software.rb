@@ -9,25 +9,25 @@ module Galaxy
     end
 
     class SoftwareConfiguration
-        attr_accessor :environment, :version, :type
+        attr_accessor :environment, :type, :version
 
-        def initialize environment, version, type
+        def initialize environment, type, version
             @environment = environment
-            @version = version
             @type = type
+            @version = version
         end
 
         def config_path
-            "/#{environment}/#{version}/#{type}"
+            "/#{environment}/#{type}/#{version}"
         end
 
         def self.new_from_config_path config_path
             # Using ! as regex delimiter since the config path contains / characters
-            unless components = %r!^/([^/]+)/([^/]+)/(.*)$!.match(config_path)
+            unless components = %r!^/([^/]+)/(.*)/([^/]+)$!.match(config_path)
                 raise "Illegal config path '#{config_path}'"
             end
-            environment, version, type = components[1], components[2], components[3]
-            new environment, version, type
+            environment, type, version = components[1], components[2], components[3]
+            new environment, type, version
         end
     end
 

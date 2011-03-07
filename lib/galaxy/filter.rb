@@ -14,10 +14,10 @@ module Galaxy
 
             if args[:env] || args[:version] || args[:type]
                 env = args[:env] || "[^/]+"
-                version = args[:version] || "[^/]+"
                 type = args[:type] || ".+"
+                version = args[:version] || "[^/]+"
 
-                filters << lambda { |a| a.config_path =~ %r!^/#{env}/#{version}/#{type}$! }
+                filters << lambda { |a| a.config_path =~ %r!^/#{env}/#{type}/#{version}$! }
             end
 
             if args[:host]

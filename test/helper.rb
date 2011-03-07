@@ -45,13 +45,13 @@ end
 
 class MockAgent
   attr_reader :host, :config_path, :stopped, :started, :restarted
-  attr_reader :gonsole_url, :env, :version, :type, :url, :agent_status, :proxy, :build, :core_type, :machine, :ip
+  attr_reader :gonsole_url, :env, :type, :version, :url, :agent_status, :proxy, :build, :core_type, :machine, :ip
 
-  def initialize host, env = nil, version = nil, type = nil, gonsole_url=nil
+  def initialize host, env = nil, type = nil, version = nil, gonsole_url=nil
     @host = host
     @env = env
-    @version = version
     @type = type
+    @version = version
     @gonsole_url = gonsole_url
     @stopped = @started = @restarted = false
 
@@ -59,7 +59,7 @@ class MockAgent
     Galaxy::Transport.publish @url, self
 
     @config_path = nil
-    @config_path = "/#{env}/#{version}/#{type}" unless env.nil? || version.nil? || type.nil?
+    @config_path = "/#{env}/#{type}/#{version}" unless env.nil? || type.nil? || version.nil?
     @agent_status = 'online'
     @status = 'online'
     @proxy = Galaxy::Transport.locate(@url)
@@ -108,14 +108,14 @@ class MockAgent
   end
 
   def become! path, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy
-    md = %r!^/([^/]+)/([^/]+)/(.*)$!.match path
-    new_env, new_version, new_type = md[1], md[2], md[3]
+    md = %r!^/([^/]+)/(.*)/([^/]+)$!.match path
+    new_env, new_type, new_version = md[1], md[2], md[3]
     # XXX We don't test the versioning code - but it should go away soon
     #raise if @version == new_version
     @env = new_env
-    @version = new_version
     @type = new_type
-    @config_path = "/#{@env}/#{@version}/#{@type}"
+    @version = new_version
+    @config_path = "/#{@env}/#{@type}/#{@version}"
     status
   end
 
@@ -123,7 +123,7 @@ class MockAgent
     # XXX We don't test the versioning code - but it should go away soon
     #raise if @version == new_version
     @version = new_version
-    @config_path = "/#{@env}/#{@version}/#{@type}"
+    @config_path = "/#{@env}/#{@type}/#{@version}"
     status
   end
 

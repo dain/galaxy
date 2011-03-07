@@ -9,12 +9,12 @@ require 'helper'
 class TestCommands < Test::Unit::TestCase
   def setup
     @agents = [
-      MockAgent.new("agent1", "alpha", "1.0", "sysc"),
-      MockAgent.new("agent2", "alpha", "1.0", "idtc"),
-      MockAgent.new("agent3", "alpha", "1.0", "appc/aclu0"),
+      MockAgent.new("agent1", "alpha", "sysc", "1.0"),
+      MockAgent.new("agent2", "alpha", "idtc", "1.0"),
+      MockAgent.new("agent3", "alpha", "appc/aclu0", "1.0"),
       MockAgent.new("agent4"),
-      MockAgent.new("agent5", "alpha", "2.0", "sysc"),
-      MockAgent.new("agent6", "beta", "1.0", "sysc"),
+      MockAgent.new("agent5", "alpha", "sysc", "2.0"),
+      MockAgent.new("agent6", "beta", "sysc", "1.0"),
       MockAgent.new("agent7")
     ]
 
@@ -152,7 +152,7 @@ class TestCommands < Test::Unit::TestCase
   end
 
   def test_assign_empty
-    command = Galaxy::Commands["assign"].new ["beta", "3.0", "rslv"], {:console => @console, :set => :empty}
+    command = Galaxy::Commands["assign"].new ["beta", "rslv", "3.0"], {:console => @console, :set => :empty}
     agents = command.select_agents(:set => :all)
     agent = @agents.select { |a| a.config_path.nil? }.first
     command.execute agents
@@ -164,7 +164,7 @@ class TestCommands < Test::Unit::TestCase
   def test_assign_by_host
     agent = @agents.select { |a| a.host == "agent7" }.first
 
-    command = Galaxy::Commands["assign"].new ["beta", "3.0", "rslv"], { :console => @console }
+    command = Galaxy::Commands["assign"].new ["beta", "rslv", "3.0"], { :console => @console }
     agents = command.select_agents(:host => agent.host)
     command.execute agents
 

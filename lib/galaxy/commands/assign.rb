@@ -9,13 +9,13 @@ module Galaxy
             def initialize args, options
                 super
 
-                env, version, type = * args
+                env, type, version = * args
 
                 raise CommandLineError.new("<env> is missing") unless env
-                raise CommandLineError.new("<version> is missing") unless version
                 raise CommandLineError.new("<type> is missing") unless type
+                raise CommandLineError.new("<version> is missing") unless version
 
-                @config_path = "/#{env}/#{version}/#{type}"
+                @config_path = "/#{env}/#{type}/#{version}"
                 @versioning_policy = options[:versioning_policy]
             end
 
@@ -29,18 +29,18 @@ module Galaxy
 
             def self.help
                 return <<-HELP
-#{name}  <env> <version> <type>
+#{name}  <env> <type> <version>
         
         Deploy software to the selected hosts
         
         Parameters:
           env      The environment
-          version  The software version
           type     The software type
-        
+          version  The software version
+
         These three parameters together define the configuration path (relative to the repository base):
         
-            <repository base>/<env>/<version>/<type>
+            <repository base>/<env>/<type>/<version>
                 HELP
             end
         end

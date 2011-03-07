@@ -13,7 +13,7 @@ class TestFilter < Test::Unit::TestCase
       :host => 'foo',
       :ip => '10.0.0.1',
       :machine => 'foomanchu',
-      :config_path => '/alpha/1.0/bloo',
+      :config_path => '/alpha/bloo/1.0',
       :status => 'running',
     })
 
@@ -21,7 +21,7 @@ class TestFilter < Test::Unit::TestCase
       :host => 'bar',
       :ip => '10.0.0.2',
       :machine => 'barmanchu',
-      :config_path => '/beta/2.0/blar',
+      :config_path => '/beta/blar/2.0',
       :status => 'stopped',
     })
 
@@ -29,7 +29,7 @@ class TestFilter < Test::Unit::TestCase
       :host => 'baz',
       :ip => '10.0.0.3',
       :machine => 'bazmanchu',
-      :config_path => '/gamma/3.0/blaz',
+      :config_path => '/gamma/blaz/3.0',
       :status => 'dead',
     })
 
