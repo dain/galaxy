@@ -45,7 +45,7 @@ end
 
 class MockAgent
   attr_reader :host, :config_path, :stopped, :started, :restarted
-  attr_reader :gonsole_url, :env, :type, :version, :url, :agent_status, :proxy, :build, :core_type, :machine, :ip
+  attr_reader :gonsole_url, :env, :type, :version, :url, :agent_status, :proxy, :group_id, :artifact_id, :binary_version, :machine, :ip
 
   def initialize host, env = nil, type = nil, version = nil, gonsole_url=nil
     @host = host
@@ -63,8 +63,9 @@ class MockAgent
     @agent_status = 'online'
     @status = 'online'
     @proxy = Galaxy::Transport.locate(@url)
-    @build = "1.2.3"
-    @core_type = 'test'
+    @group_id = 'my.group'
+    @artifact_id = 'test'
+    @binary_version = "1.2.3"
 
     @ip = nil
     @drb_url = nil
@@ -83,9 +84,10 @@ class MockAgent
           :url => @drb_url,
           :os => @os,
           :machine => @machine,
-          :core_type => @core_type,
+          :group_id => @group_id,
+          :artifact_id => @artifact_id,
+          :version => @binary_version,
           :config_path => @config_path,
-          :build => @build,
           :status => @status,
           :agent_status => 'online',
           :galaxy_version => Galaxy::Version

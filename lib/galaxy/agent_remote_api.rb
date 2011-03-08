@@ -67,11 +67,13 @@ module Galaxy
                 FileUtils.rm(archive_path) if archive_path && File.exists?(archive_path)
 
                 # update store to new installation
-                new_deployment_config = OpenStruct.new(:core_type => "#{group_id}:#{artifact_id}",
-                                                       :build => version,
-                                                       :core_base => core_base,
-                                                       :config_path => requested_config.config_path,
-                                                       :auto_start => true)
+                new_deployment_config = OpenStruct.new(
+                    :group_id => group_id,
+                    :artifact_id => artifact_id,
+                    :version => version,
+                    :core_base => core_base,
+                    :config_path => requested_config.config_path,
+                    :auto_start => true)
                 write_config new_deployment, new_deployment_config
                 self.current_deployment_number = new_deployment
 
@@ -135,8 +137,8 @@ module Galaxy
                     raise error_reason
                 end
 
-                if config.core_type != "#{group_id}:#{artifact_id}"
-                    error_reason = "Binary type differs (#{config.core_type} != #{type})"
+                if config.group_id != group_id || config.artifact_id != artifact_id
+                    error_reason = "Binary type differs (#{config.group_id}:#{config.artifact_id} != #{group_id}#{artifact_id})"
                     @event_dispatcher.dispatch_update_config_error_event error_reason
                     raise error_reason
                 end
@@ -158,10 +160,12 @@ module Galaxy
                     raise error_reason
                 end
 
-                @config = OpenStruct.new(:core_type => "#{group_id}:#{artifact_id}",
-                                         :build => build,
-                                         :core_base => config.core_base,
-                                         :config_path => requested_config.config_path)
+                @config = OpenStruct.new(
+                    :group_id => group_id,
+                    :artifact_id => artifact_id,
+                    :version => version,
+                    :core_base => config.core_base,
+                    :config_path => requested_config.config_path)
 
                 write_config(current_deployment_number, @config)
 

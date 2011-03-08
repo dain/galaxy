@@ -36,9 +36,10 @@ class TestEvent < Test::Unit::TestCase
                  :url => "drb://goofabr.company.pouet",
                  :os => "Linux",
                  :machine => "foobar",
-                 :core_type => "tester",
+                 :group_id => "my.group",
+                 :artifact_id => "tester",
+                 :version => "124212",
                  :config_path => "conf/bar/baz",
-                 :build => "124212",
                  :status => "running",
                  :agent_status => "online",
                  :galaxy_version => "2.5.1",
@@ -70,12 +71,13 @@ class TestEvent < Test::Unit::TestCase
                  :os => "solaris",
                  :host => "prod1.company.com",
                  :galaxy_version => "2.6.0.5",
-                 :core_type => "apache",
+                 :group_id => "my.group",
+                 :artifact_id => "apache",
+                 :version => "6.1.10",
                  :machine => "localhost",
                  :status => "stopped",
                  :url => "drb://prod2.company.com:4441",
                  :config_path => "alpha/DEP-1/apache",
-                 :build => "6.1.10",
                  :ip => "0.1.9.1"
            )
         assert @galaxy_sender.dispatch_announce_success_event(event)

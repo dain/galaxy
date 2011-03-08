@@ -73,7 +73,7 @@ module Galaxy
             private
 
             def format_string
-                STDOUT.tty? ? "%-20s %-45s %-10s %-15s %-20s %-20s %-15s %-8s\n" : "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
+                STDOUT.tty? ? "%-20s %-45s %-10s %-15s %-20s %-20s %-15s %-8s\n" : "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
             end
 
             def format_field field
@@ -85,8 +85,9 @@ module Galaxy
                     format_field(result.host),
                     format_field(result.config_path),
                     format_field(result.status),
-                    format_field(result.build),
-                    format_field(result.core_type),
+                    format_field(result.group_id),
+                    format_field(result.artifact_id),
+                    format_field(result.version),
                     format_field(result.machine),
                     format_field(result.ip),
                     format_field(result.agent_status),
@@ -98,7 +99,7 @@ module Galaxy
             private
 
             def format_string
-                STDOUT.tty? ? "%-20s %-45s %-10s %-15s %-20s %-14s\n" : "%s\t%s\t%s\t%s\t%s\t%s\n"
+                STDOUT.tty? ? "%-20s %-45s %-10s %-15s %-20s %-14s\n" : "%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
             end
 
             def format_field field
@@ -110,8 +111,9 @@ module Galaxy
                     format_field(result.host),
                     format_field(result.config_path),
                     format_field(result.status),
-                    format_field(result.build),
-                    format_field(result.core_type),
+                    format_field(result.group_id),
+                    format_field(result.artifact_id),
+                    format_field(result.version),
                     format_field(result.last_start_time),
                 ]
             end
@@ -121,7 +123,7 @@ module Galaxy
             private
 
             def format_string
-                STDOUT.tty? ? "%-45s %-10s %-15s %-20s %s\n" : "%s\t%s\t%s\t%s\t%s\n"
+                STDOUT.tty? ? "%-45s %-10s %-15s %-20s %s\n" : "%s\t%s\t%s\t%s\t%s\t%s\n"
             end
 
             def format_field field
@@ -132,8 +134,9 @@ module Galaxy
                 [
                     format_field(result.config_path),
                     format_field(result.status),
-                    format_field(result.build),
-                    format_field(result.core_type),
+                    format_field(result.group_id),
+                    format_field(result.artifact_id),
+                    format_field(result.version),
                     "autostart=#{result.auto_start}",
                 ]
             end
