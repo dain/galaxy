@@ -2,6 +2,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 $:.unshift File.join(File.dirname(__FILE__))
 
 require 'test/unit'
+require 'galaxy/binary_version'
 require 'galaxy/fetcher'
 require 'helper'
 require 'fileutils'
@@ -29,19 +30,19 @@ class TestFetcher < Test::Unit::TestCase
   end
     
   def test_local_fetch
-    path = @local_fetcher.fetch "my.groupId", "artifactId", "version", "properties"
+    path = @local_fetcher.fetch Galaxy::BinaryVersion.new("my.groupId", "artifactId", "version", "properties")
     assert File.exists?(path)
   end
   
   def test_http_fetch
-    path = @http_fetcher.fetch "my.groupId", "artifactId", "version", "properties"
+    path = @http_fetcher.fetch Galaxy::BinaryVersion.new("my.groupId", "artifactId", "version", "properties")
     assert File.exists?(path)
   end
 
   def test_http_fetch_not_found
     assert_raise RuntimeError do
       @server.logger.level = Logger::FATAL
-      path = @http_fetcher.fetch "gorple", "fez", "properties"
+      path = @http_fetcher.fetch Galaxy::BinaryVersion.new("gorple", "fez", "99", "properties")
       @server.logger.level = Logger::WARN
     end
   end

@@ -1,6 +1,7 @@
 require 'tempfile'
 require 'fileutils'
 
+require 'galaxy/binary_version'
 require 'galaxy/filter'
 require 'galaxy/temp'
 require 'galaxy/transport'
@@ -45,7 +46,7 @@ end
 
 class MockAgent
   attr_reader :host, :config_path, :stopped, :started, :restarted
-  attr_reader :gonsole_url, :env, :type, :version, :url, :agent_status, :proxy, :group_id, :artifact_id, :binary_version, :machine, :ip
+  attr_reader :gonsole_url, :env, :type, :version, :url, :agent_status, :proxy, :binary_version, :machine, :ip
 
   def initialize host, env = nil, type = nil, version = nil, gonsole_url=nil
     @host = host
@@ -63,9 +64,7 @@ class MockAgent
     @agent_status = 'online'
     @status = 'online'
     @proxy = Galaxy::Transport.locate(@url)
-    @group_id = 'my.group'
-    @artifact_id = 'test'
-    @binary_version = "1.2.3"
+    @binary_version = Galaxy::BinaryVersion.new('my.group', 'test', '1.2.3')
 
     @ip = nil
     @drb_url = nil
@@ -84,9 +83,7 @@ class MockAgent
           :url => @drb_url,
           :os => @os,
           :machine => @machine,
-          :group_id => @group_id,
-          :artifact_id => @artifact_id,
-          :version => @binary_version,
+          :binary_version => @binary_version.gav,
           :config_path => @config_path,
           :status => @status,
           :agent_status => 'online',
@@ -109,7 +106,7 @@ class MockAgent
     status
   end
 
-  def become! path, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy
+  def become! path, binary_version, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy
     md = %r!^/([^/]+)/(.*)/([^/]+)$!.match path
     new_env, new_type, new_version = md[1], md[2], md[3]
     # XXX We don't test the versioning code - but it should go away soon

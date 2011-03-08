@@ -26,7 +26,7 @@ module Galaxy
                 current_config = Galaxy::SoftwareConfiguration.new_from_config_path(agent.config_path) # TODO - this should already be tracked
                 requested_config = current_config.dup
                 requested_config.version = @requested_version
-                agent.proxy.become!(requested_config.config_path, @versioning_policy)
+                agent.proxy.become!(requested_config.config_path, agent.binary_version, @versioning_policy)
             end
 
             def self.help

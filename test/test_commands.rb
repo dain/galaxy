@@ -152,7 +152,7 @@ class TestCommands < Test::Unit::TestCase
   end
 
   def test_assign_empty
-    command = Galaxy::Commands["assign"].new ["beta", "rslv", "3.0"], {:console => @console, :set => :empty}
+    command = Galaxy::Commands["assign"].new ["beta", "rslv", "3.0", "my.group:test:1.0-12345"], {:console => @console, :set => :empty}
     agents = command.select_agents(:set => :all)
     agent = @agents.select { |a| a.config_path.nil? }.first
     command.execute agents
@@ -164,7 +164,7 @@ class TestCommands < Test::Unit::TestCase
   def test_assign_by_host
     agent = @agents.select { |a| a.host == "agent7" }.first
 
-    command = Galaxy::Commands["assign"].new ["beta", "rslv", "3.0"], { :console => @console }
+    command = Galaxy::Commands["assign"].new ["beta", "rslv", "3.0", "my.group:test:1.0-12345"], { :console => @console }
     agents = command.select_agents(:host => agent.host)
     command.execute agents
 

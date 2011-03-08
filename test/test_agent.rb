@@ -2,6 +2,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 $:.unshift File.join(File.dirname(__FILE__))
 
 require 'test/unit'
+require 'galaxy/binary_version'
 require 'galaxy/transport'
 require 'galaxy/agent'
 require 'galaxy/host'
@@ -65,19 +66,19 @@ class TestAgent < Test::Unit::TestCase
   end
 
   def test_agent_assign
-    @agent.become! '/a/b/c'
+    @agent.become! '/a/b/c', Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345')
     assert File.exist?(File.join(@deploy_dir, 'current', 'bin'))
   end
 
   def test_agent_perform
-    @agent.become! '/a/b/c'
+    @agent.become! '/a/b/c', Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345')
     assert_nothing_raised do
       @agent.perform! 'test-success'
     end
   end
 
   def test_agent_perform_failure
-    @agent.become! '/a/b/c'
+    @agent.become! '/a/b/c', Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345')
     assert_raise RuntimeError do
       @agent.logger.log.level = Logger::FATAL
       # The failure will spit a stacktrace in the log (ERROR)

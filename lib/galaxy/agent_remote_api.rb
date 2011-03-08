@@ -1,9 +1,10 @@
 require 'galaxy/config_installer'
+require 'galaxy/binary_version'
 
 module Galaxy
     module AgentRemoteApi
         # Command to become a specific core
-        def become! requested_config_path, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy # TODO - make this configurable w/ default
+        def become! requested_config_path, binary_version, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy # TODO - make this configurable w/ default
             lock
 
             begin
@@ -19,43 +20,13 @@ module Galaxy
                     end
                 end
 
-                # fetch build.properties from config store
-                build_properties = @prop_builder.build(requested_config.config_path, "build.properties")
-                group_id = build_properties['groupId']
-                artifact_id = build_properties['artifactId']
-                version = build_properties['version']
-                os = build_properties['os']
-
-                # verify build.properties
-                if group_id.nil?
-                    error_reason = "No groupId for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_become_error_event error_reason
-                    raise error_reason
-                end
-                if artifact_id.nil?
-                    error_reason = "No groupId for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_become_error_event error_reason
-                    raise error_reason
-                end
-                if version.nil?
-                    error_reason = "No version for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_become_error_event error_reason
-                    raise error_reason
-                end
-                if os and os != @os
-                    error_reason = "Cannot assign #{requested_config.config_path} to #{@os} host (requires #{os})"
-                    @event_dispatcher.dispatch_become_error_event error_reason
-                    raise error_reason
-                end
-
-
-                @logger.info "Becoming #{group_id}:#{artifact_id}:#{version} with #{requested_config.config_path}"
+                @logger.info "Becoming #{binary_version.gav} with #{requested_config.config_path}"
 
                 # todo stop! should only happen after a a successful install
                 stop!
 
                 # fetch the archive
-                archive_path = @fetcher.fetch group_id, artifact_id, version
+                archive_path = @fetcher.fetch binary_version
 
                 # create config installer
                 config_installer = Galaxy::ConfigInstaller.new(@repository_base, requested_config.config_path)
@@ -68,9 +39,7 @@ module Galaxy
 
                 # update store to new installation
                 new_deployment_config = OpenStruct.new(
-                    :group_id => group_id,
-                    :artifact_id => artifact_id,
-                    :version => version,
+                    :binary_version => binary_version.gav,
                     :core_base => core_base,
                     :config_path => requested_config.config_path,
                     :auto_start => true)
@@ -116,39 +85,6 @@ module Galaxy
                     raise error_reason
                 end
 
-                build_properties = @prop_builder.build(requested_config.config_path, "build.properties")
-                group_id = build_properties['groupId']
-                artifact_id = build_properties['artifactId']
-                version = build_properties['version']
-
-                if group_id.nil?
-                    error_reason = "No groupId for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_update_config_error_event error_reason
-                    raise error_reason
-                end
-                if artifact_id.nil?
-                    error_reason = "No groupId for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_update_config_error_event error_reason
-                    raise error_reason
-                end
-                if version.nil?
-                    error_reason = "No version for #{requested_config.config_path}"
-                    @event_dispatcher.dispatch_update_config_error_event error_reason
-                    raise error_reason
-                end
-
-                if config.group_id != group_id || config.artifact_id != artifact_id
-                    error_reason = "Binary type differs (#{config.group_id}:#{config.artifact_id} != #{group_id}#{artifact_id})"
-                    @event_dispatcher.dispatch_update_config_error_event error_reason
-                    raise error_reason
-                end
-
-                if config.build != version
-                    error_reason = "Binary build number differs (#{config.build} != #{version})"
-                    @event_dispatcher.dispatch_update_config_error_event error_reason
-                    raise error_reason
-                end
-
                 @logger.info "Updating configuration to #{requested_config.config_path}"
 
                 controller = Galaxy::Controller.new config.core_base, config.config_path, @repository_base, @binaries_base, @logger
@@ -161,9 +97,7 @@ module Galaxy
                 end
 
                 @config = OpenStruct.new(
-                    :group_id => group_id,
-                    :artifact_id => artifact_id,
-                    :version => version,
+                    :binary_version => binary_version,
                     :core_base => config.core_base,
                     :config_path => requested_config.config_path)
 
