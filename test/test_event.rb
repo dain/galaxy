@@ -37,7 +37,7 @@ class TestEvent < Test::Unit::TestCase
                  :os => "Linux",
                  :machine => "foobar",
                  :binary_version => "my.group:tester:124212",
-                 :config_path => "conf/bar/baz",
+                 :config_version => "@conf:bar:baz",
                  :status => "running",
                  :agent_status => "online",
                  :galaxy_version => "2.5.1",
@@ -73,7 +73,7 @@ class TestEvent < Test::Unit::TestCase
                  :machine => "localhost",
                  :status => "stopped",
                  :url => "drb://prod2.company.com:4441",
-                 :config_path => "alpha/DEP-1/apache",
+                 :config_version => "@alpha:DEP-1:apache",
                  :ip => "0.1.9.1"
            )
         assert @galaxy_sender.dispatch_announce_success_event(event)

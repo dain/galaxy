@@ -2,7 +2,7 @@ module Galaxy
   class BinaryVersion
     attr_reader :group_id, :artifact_id, :packaging, :classifier, :version
 
-    def initialize group_id, artifact_id, version, packaging='tar.gz', classifier=nil
+    def initialize(group_id, artifact_id, version, packaging='tar.gz', classifier=nil)
       if group_id.nil? then
         raise "group_id is nil"
       end
@@ -23,7 +23,7 @@ module Galaxy
       @version = version
     end
 
-    def self.new_from_gav gav
+    def self.new_from_gav(gav)
       unless components = /^([^:]+):([^:]+)(?::([^:]+))?(?::([^:]+))?:([^:]+)$/.match(gav)
         raise "Illegal binary version '#{gav}'"
       end
@@ -46,10 +46,12 @@ module Galaxy
       path = "#{group_id.gsub('.', '/')}/#{artifact_id}/#{version}/#{artifact_id}-#{version}"
       path += "-#{classifier}" unless classifier.nil?
       path += ".#{packaging}"
+      path
     end
 
     def == other
-      group_id == other.group_id &&
+      !other.nil? &&
+          group_id == other.group_id &&
           artifact_id == other.artifact_id &&
           packaging == other.packaging &&
           classifier == other.classifier &&

@@ -3,6 +3,7 @@ $:.unshift File.join(File.dirname(__FILE__))
 
 require 'test/unit'
 require 'ostruct'
+require 'galaxy/config_version'
 require 'galaxy/filter'
 
 class TestFilter < Test::Unit::TestCase
@@ -13,7 +14,7 @@ class TestFilter < Test::Unit::TestCase
       :host => 'foo',
       :ip => '10.0.0.1',
       :machine => 'foomanchu',
-      :config_path => '/alpha/bloo/1.0',
+      :config_version => Galaxy::ConfigVersion.new_from_config_spec('@alpha:bloo:1.0'),
       :status => 'running',
     })
 
@@ -21,7 +22,7 @@ class TestFilter < Test::Unit::TestCase
       :host => 'bar',
       :ip => '10.0.0.2',
       :machine => 'barmanchu',
-      :config_path => '/beta/blar/2.0',
+      :config_version => Galaxy::ConfigVersion.new_from_config_spec('@beta:blar:2.0'),
       :status => 'stopped',
     })
 
@@ -29,7 +30,7 @@ class TestFilter < Test::Unit::TestCase
       :host => 'baz',
       :ip => '10.0.0.3',
       :machine => 'bazmanchu',
-      :config_path => '/gamma/blaz/3.0',
+      :config_version => Galaxy::ConfigVersion.new_from_config_spec('@gamma:blaz:3.0'),
       :status => 'dead',
     })
 
@@ -109,13 +110,13 @@ class TestFilter < Test::Unit::TestCase
   end
   
   def test_filter_by_known_env
-    filter = Galaxy::Filter.new :env => "beta"
+    filter = Galaxy::Filter.new :environment => "beta"
     
     assert_equal [@bar], @agents.select(&filter)
   end
   
-  def test_filter_by_known_env
-    filter = Galaxy::Filter.new :env => "unknown"
+  def test_filter_by_unknown_env
+    filter = Galaxy::Filter.new :environment => "unknown"
     
     assert_equal [ ], @agents.select(&filter)
   end
@@ -133,13 +134,13 @@ class TestFilter < Test::Unit::TestCase
   end
   
   def test_filter_by_known_type
-    filter = Galaxy::Filter.new :type => "bloo"
+    filter = Galaxy::Filter.new :component => "bloo"
 
     assert_equal [@foo], @agents.select(&filter)
   end
   
   def test_filter_by_unknown_type
-    filter = Galaxy::Filter.new :type => "unknown"
+    filter = Galaxy::Filter.new :component => "unknown"
 
     assert_equal [ ], @agents.select(&filter)
   end
@@ -187,7 +188,7 @@ class TestFilter < Test::Unit::TestCase
   end
 
   def test_filter_by_unknown_env_like_known_env
-    filter = Galaxy::Filter.new :env => "bet"          #don't match with "beta"
+    filter = Galaxy::Filter.new :environment => "bet"          #don't match with "beta"
 
     assert_equal [ ], @agents.select(&filter)
   end
@@ -199,7 +200,7 @@ class TestFilter < Test::Unit::TestCase
   end
 
   def test_filter_by_unknown_type_like_known_type
-    filter = Galaxy::Filter.new :type => "blo"          # don't match with "bloo"
+    filter = Galaxy::Filter.new :component => "blo"          # don't match with "bloo"
 
     assert_equal [ ], @agents.select(&filter)
   end

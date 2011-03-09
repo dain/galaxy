@@ -2,6 +2,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 $:.unshift File.join(File.dirname(__FILE__))
 
 require 'test/unit'
+require 'galaxy/config_version'
 require 'galaxy/binary_version'
 require 'galaxy/transport'
 require 'galaxy/agent'
@@ -60,25 +61,25 @@ class TestAgent < Test::Unit::TestCase
   end
 
   def teardown
-    @agent.shutdown
-    @server.shutdown
+    @agent.shutdown if @agent
+    @server.shutdown if @server
     FileUtils.rm_rf @tempdir
   end
 
   def test_agent_assign
-    @agent.become! '/a/b/c', Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345')
+    @agent.become! Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345'), Galaxy::ConfigVersion.new('env', 'component', 'version')
     assert File.exist?(File.join(@deploy_dir, 'current', 'bin'))
   end
 
   def test_agent_perform
-    @agent.become! '/a/b/c', Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345')
+    @agent.become! Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345'), Galaxy::ConfigVersion.new('env', 'component', 'version')
     assert_nothing_raised do
       @agent.perform! 'test-success'
     end
   end
 
   def test_agent_perform_failure
-    @agent.become! '/a/b/c', Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345')
+    @agent.become! Galaxy::BinaryVersion.new('my.group', 'test', '1.0-12345'), Galaxy::ConfigVersion.new('env', 'component', 'version')
     assert_raise RuntimeError do
       @agent.logger.log.level = Logger::FATAL
       # The failure will spit a stacktrace in the log (ERROR)

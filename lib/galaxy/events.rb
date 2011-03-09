@@ -183,7 +183,7 @@ module Galaxy
             url += escape(add_field("s", event.status))
             url += escape(add_field("s", event.galaxy_event_type))
             url += escape(add_field("s", event.url))
-            url += escape(add_field("s", event.config_path))
+            url += escape(add_field("s", event.config_version))
             url += escape(add_field("s", event.ip))
             url += escape(add_field("s", event.user))
             url += escape(add_field("s", event.gonsole_url))

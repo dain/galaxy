@@ -14,9 +14,6 @@ require 'galaxy/deployer'
 require 'galaxy/events'
 require 'galaxy/fetcher'
 require 'galaxy/log'
-require 'galaxy/properties'
-require 'galaxy/repository'
-require 'galaxy/software'
 require 'galaxy/starter'
 require 'galaxy/transport'
 require 'galaxy/version'
@@ -24,7 +21,7 @@ require 'galaxy/versioning'
 
 module Galaxy
     class Agent
-        attr_reader :host, :machine, :config, :locked, :logger, :gonsole_url
+        attr_reader :host, :machine, :config, :locked, :logger, :gonsole_url, :config_version, :binary_version
         attr_accessor :starter, :fetcher, :deployer, :db
 
         include Galaxy::AgentRemoteApi
@@ -50,8 +47,6 @@ module Galaxy
             @event_dispatcher = Galaxy::GalaxyEventSender.new(event_listener, @gonsole_url, @ip, @logger)
 
             @announce_interval = announce_interval
-            @prop_builder = Galaxy::Properties::Builder.new repository_base, @logger
-            @repository = Galaxy::Repository.new repository_base, @logger
             @deployer = Galaxy::Deployer.new deploy_dir, @logger
             @fetcher = Galaxy::Fetcher.new binaries_base, @logger
             @starter = Galaxy::Starter.new @logger
@@ -66,7 +61,7 @@ module Galaxy
 
             @logger.debug "Detected machine: #{@machine}"
 
-            @config = read_config current_deployment_number
+            @config = read_config(current_deployment_number)
 
             Galaxy::Transport.publish url, self
             announce
@@ -109,7 +104,7 @@ module Galaxy
                 :os => @os,
                 :machine => @machine,
                 :binary_version => config.binary_version,
-                :config_path => config.config_path,
+                :config_version => config.config_version,
                 :status => @starter.status(config.core_base),
                 :last_start_time => config.last_start_time,
                 :agent_status => 'online',
@@ -251,7 +246,7 @@ module Galaxy
             agent
         end
 
-        private :initialize, :sync_state!, :config
+        private :initialize, :sync_state!
     end
 
 end

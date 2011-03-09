@@ -19,7 +19,7 @@ require 'galaxy/announcements'
 
 module Galaxy
     class Console
-        attr_reader :db, :drb_url, :http_url, :ping_interval, :host, :env, :logger
+        attr_reader :db, :drb_url, :http_url, :ping_interval, :host, :environment, :logger
 
         def self.locate url
             Galaxy::Transport.locate url

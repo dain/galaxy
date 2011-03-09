@@ -84,8 +84,8 @@ require 'galaxy/versioning'
         end
     end
 
-    opts.on("-e", "--env ENV", "Select agents in the given environment") { |arg| @filter[:env] = arg }
-    opts.on("-t", "--type TYPE", "Select agents with a given software type") { |arg| @filter[:type] = arg }
+    opts.on("-e", "--env ENV", "Select agents in the given environment") { |arg| @filter[:environment] = arg }
+    opts.on("-t", "--type TYPE", "Select agents with a given software type") { |arg| @filter[:component] = arg }
     opts.on("-v", "--version VERSION", "Select agents with a given software version") { |arg| @filter[:version] = arg }
 
     opts.separator ""

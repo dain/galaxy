@@ -16,7 +16,7 @@ class TestConsole < Test::Unit::TestCase
       :host => 'foo',
       :ip => '10.0.0.1',
       :machine => 'foomanchu',
-      :config_path => '/alpha/1.0/bloo',
+      :config_version => '@alpha:1.0:bloo',
       :status => 'running'
     })
 
@@ -24,7 +24,7 @@ class TestConsole < Test::Unit::TestCase
       :host => 'bar',
       :ip => '10.0.0.2',
       :machine => 'barmanchu',
-      :config_path => '/beta/2.0/blar',
+      :config_version => '@beta:2.0:blar',
       :status => 'stopped'
     })
 
@@ -32,7 +32,7 @@ class TestConsole < Test::Unit::TestCase
       :host => 'baz',
       :ip => '10.0.0.3',
       :machine => 'bazmanchu',
-      :config_path => '/gamma/3.0/blaz',
+      :config_version => '@gamma:3.0:blaz',
       :status => 'dead'
     })
 

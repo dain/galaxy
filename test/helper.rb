@@ -2,6 +2,7 @@ require 'tempfile'
 require 'fileutils'
 
 require 'galaxy/binary_version'
+require 'galaxy/config_version'
 require 'galaxy/filter'
 require 'galaxy/temp'
 require 'galaxy/transport'
@@ -45,26 +46,22 @@ class MockConsole
 end
 
 class MockAgent
-  attr_reader :host, :config_path, :stopped, :started, :restarted
-  attr_reader :gonsole_url, :env, :type, :version, :url, :agent_status, :proxy, :binary_version, :machine, :ip
+  attr_reader :host, :stopped, :started, :restarted
+  attr_reader :gonsole_url, :binary_version, :config_version, :url, :agent_status, :proxy, :machine, :ip
 
-  def initialize host, env = nil, type = nil, version = nil, gonsole_url=nil
+  def initialize host, binary_version = nil, config_version = nil, gonsole_url=nil
     @host = host
-    @env = env
-    @type = type
-    @version = version
+    @binary_version = binary_version
+    @config_version = config_version
     @gonsole_url = gonsole_url
     @stopped = @started = @restarted = false
 
     @url = "local://#{host}"
     Galaxy::Transport.publish @url, self
 
-    @config_path = nil
-    @config_path = "/#{env}/#{type}/#{version}" unless env.nil? || type.nil? || version.nil?
     @agent_status = 'online'
     @status = 'online'
     @proxy = Galaxy::Transport.locate(@url)
-    @binary_version = Galaxy::BinaryVersion.new('my.group', 'test', '1.2.3')
 
     @ip = nil
     @drb_url = nil
@@ -83,8 +80,8 @@ class MockAgent
           :url => @drb_url,
           :os => @os,
           :machine => @machine,
-          :binary_version => @binary_version.gav,
-          :config_path => @config_path,
+          :binary_version => @binary_version ? @binary_version.gav : nil ,
+          :config_version => @config_version ? @config_version.config_spec : nil,
           :status => @status,
           :agent_status => 'online',
           :galaxy_version => Galaxy::Version
@@ -106,23 +103,15 @@ class MockAgent
     status
   end
 
-  def become! path, binary_version, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy
-    md = %r!^/([^/]+)/(.*)/([^/]+)$!.match path
-    new_env, new_type, new_version = md[1], md[2], md[3]
-    # XXX We don't test the versioning code - but it should go away soon
-    #raise if @version == new_version
-    @env = new_env
-    @type = new_type
-    @version = new_version
-    @config_path = "/#{@env}/#{@type}/#{@version}"
+  def become! binary_version, config_version, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy
+    @binary_version = binary_version
+    @config_version = config_version
     status
   end
 
   def update_config! new_version, versioning_policy = Galaxy::Versioning::StrictVersioningPolicy
     # XXX We don't test the versioning code - but it should go away soon
-    #raise if @version == new_version
-    @version = new_version
-    @config_path = "/#{@env}/#{@type}/#{@version}"
+    @config_version = Galaxy::ConfigVersion.new(@config_version.environment, @config_version.component, new_version, @config_version.pool)
     status
   end
 

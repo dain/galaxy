@@ -43,7 +43,7 @@ module Galaxy
                     format_field(result.drb_url),
                     format_field(result.http_url),
                     format_field(result.host),
-                    format_field(result.env),
+                    format_field(result.environment),
                     format_field(result.ping_interval),
                 ]
             end
@@ -83,7 +83,7 @@ module Galaxy
             def format_result result
                 [
                     format_field(result.host),
-                    format_field(result.config_path),
+                    format_field(result.config_version),
                     format_field(result.status),
                     format_field(result.binary_version),
                     format_field(result.machine),
@@ -107,7 +107,7 @@ module Galaxy
             def format_result result
                 [
                     format_field(result.host),
-                    format_field(result.config_path),
+                    format_field(result.config_version),
                     format_field(result.status),
                     format_field(result.binary_version),
                     format_field(result.last_start_time),
@@ -128,7 +128,7 @@ module Galaxy
 
             def format_result result
                 [
-                    format_field(result.config_path),
+                    format_field(result.config_version),
                     format_field(result.status),
                     format_field(result.binary_version),
                     "autostart=#{result.auto_start}",

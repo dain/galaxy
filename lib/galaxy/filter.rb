@@ -7,17 +7,22 @@ module Galaxy
                 when :all, "all"
                     filters << lambda { true }
                 when :empty, "empty"
-                    filters << lambda { |a| a.config_path.nil? }
+                    filters << lambda { |a| a.config_version.nil? }
                 when :taken, "taken"
-                    filters << lambda { |a| a.config_path }
+                    filters << lambda { |a| a.config_version }
             end
 
-            if args[:env] || args[:version] || args[:type]
-                env = args[:env] || "[^/]+"
-                type = args[:type] || ".+"
-                version = args[:version] || "[^/]+"
+            if args[:environment] || args[:component] || args[:version]
+                environment = Regexp.new('^' + (args[:environment] || ".*").to_s() +'$')
+                component = Regexp.new('^' + (args[:component] || ".*").to_s() +'$')
+                version = Regexp.new('^' + (args[:version] || ".*").to_s() +'$')
 
-                filters << lambda { |a| a.config_path =~ %r!^/#{env}/#{type}/#{version}$! }
+                filters << lambda do |a|
+                  !a.config_version.nil? &&
+                      a.config_version.environment =~ environment &&
+                      a.config_version.component =~ component &&
+                      a.config_version.version =~ version
+                end
             end
 
             if args[:host]

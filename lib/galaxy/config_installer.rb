@@ -4,8 +4,8 @@ require 'open-uri'
 module Galaxy
   class ConfigInstaller
 
-    def initialize repository_base, config_path
-      @base_url = repository_base + config_path + '/'
+    def initialize repository_base,  config_version
+      @base_url = repository_base + '/' + config_version.repository_path + '/'
     end
 
     def install(base_path)

@@ -1,3 +1,6 @@
+require 'galaxy/command'
+require 'galaxy/client'
+
 module Galaxy
     module Commands
         class UpdateConfigCommand < Command
@@ -20,10 +23,9 @@ module Galaxy
             end
 
             def execute_for_agent agent
-                if agent.config_path.nil? or agent.config_path.empty?
+                if agent.config_version.nil?
                     raise "Cannot update configuration of unassigned agent"
                 end
-                current_config = Galaxy::SoftwareConfiguration.new_from_config_path(agent.config_path) # TODO - this should already be tracked
                 agent.proxy.update_config!(@requested_version, @versioning_policy)
             end
 
